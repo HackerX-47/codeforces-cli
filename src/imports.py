@@ -1,1 +1,4 @@
-import requests as req, click, json, re
+import requests as req
+import click
+import json
+import re

@@ -32,6 +32,19 @@ def caller(method, params):
     
     return None
 
+def summary(st_dict):
+
+    ac_count = st_dict['ac']
+    count = st_dict['count']
+    accuracy = (ac_count/count)*100 if count else 0
+    print()
+    print('Summary')
+    print('------------------')
+    print('AC       : ', ac_count)
+    print('Total    : ', count)
+    print('Accuracy : ', f'{accuracy:.2f}%')
+    return
+
 @click.group()
 def cli():
     pass
@@ -49,12 +62,12 @@ def user(name):
 
     handle    = user.get('handle')
     fullName  = f'{user.get('firstName') or ''} {user.get('lastName') or ''}'.strip() or 'N/A'
-    rating    = user.get('rating') or 'unrated'
-    rank      = user.get('rank') or 'unrated'
-    maxRating = user.get('maxRating') or 'unrated'
+    rating    = user.get('rating') or 'Unrated'
+    rank      = user.get('rank').capitalize() or 'Unrated'
+    maxRating = user.get('maxRating') or 'Unrated'
     org       = user.get('organization') or 'N/A'
 
-    print('user details')
+    print('\nuser details')
     print('----------------------------')
     print('handle       : ', handle)
     print('full name    : ', fullName)
@@ -72,7 +85,7 @@ def rating(name):
     if data is None:
         return 
 
-    print(f"{'contest type':<25} {'rank':>10} {'Δrating':>10} {'new Rating':>10}")
+    print(f"\n{'contest type':<25} {'rank':>10} {'Δrating':>10} {'new Rating':>10}")
     print('----------------------------------------------------------')
 
     for curr in data:
@@ -84,6 +97,7 @@ def rating(name):
 
         if matches: contestType = " + ".join(matches)
         else:       contestType = contestName
+
         print(f"{contestType:<25} {rank:>10} {ratingChange:>+10} {curr['newRating']:>10}")
 
     print()
@@ -91,10 +105,12 @@ def rating(name):
     print('Current Rating: ', data[-1]['newRating'])
 
 @cli.command()
+@click.option('--last', default=20, show_default=True, type=int)
 @click.argument('name')
-def submissions(name):
+def submissions(name, last):
 
-    params = {'handle' : name, 'from' : 1, 'count' : 20}
+    count = last
+    params = {'handle' : name, 'from' : 1, 'count' : count}
     data = caller('user.status', params)
     if data is None:
         return 
@@ -108,7 +124,9 @@ def submissions(name):
         'COMPILATION_ERROR' : 'CE',
     }
 
-    print(f"{'prob':<5} {'rating':<10} {'verdict':<10} {'lang':<20}")
+    ac_count = 0
+
+    print(f"\n{'prob':<5} {'rating':<10} {'verdict':<10} {'lang':<20}")
     print('----------------------------------------------------')
 
     for curr in data:
@@ -120,8 +138,12 @@ def submissions(name):
         lang = curr['programmingLanguage']
         verdict = status[curr['verdict']]
 
+        if verdict == 'AC': ac_count += 1
+
         print(f"{idx:<5} {rating:<10} {verdict:<10} {lang:<20}")
 
+    st = {'ac' : ac_count, 'count' : count}
+    summary(st)
 
 if __name__ == '__main__':
     cli()

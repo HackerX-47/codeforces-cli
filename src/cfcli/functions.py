@@ -1,4 +1,4 @@
-from imports import *
+from cfcli.imports import *
 
 def summary(st_dict):
 

@@ -40,10 +40,37 @@ def summary(st_dict):
     print()
     print('Summary')
     print('------------------')
-    print('AC       : ', ac_count)
-    print('Total    : ', count)
-    print('Accuracy : ', f'{accuracy:.2f}%')
+    print('AC           : ', ac_count)
+    print('Total        : ', count)
+    print('Accuracy     : ', f'{accuracy:.2f}%')
+    print('Top Language : ', st_dict['lang'])
     return
+
+def normalize_lang(lang):
+    lang = lang.lower()
+
+    if 'gnu' in lang or 'c++' in lang:
+        return "cpp"
+
+    if 'c#' in lang:
+        return "c#"
+
+    if 'go' in lang:
+        return "go"
+
+    if 'java' in lang:
+        return 'java'
+
+    if 'kotlin' in lang:
+        return 'kotlin'
+
+    if 'javascript' in lang or 'node.js' in lang:
+        return 'js'
+    
+    if 'python' in lang or 'pypy' in lang:
+        return 'python'
+
+    return "others"
 
 @click.group()
 def cli():
@@ -116,12 +143,23 @@ def submissions(name, last):
         return 
 
     status = {
-        'OK' : 'AC',
-        'WRONG_ANSWER' : 'WA',
-        'TIME_LIMIT_EXCEEDED' : 'TLE',
+        'OK'                    : 'AC',
+        'WRONG_ANSWER'          : 'WA',
+        'TIME_LIMIT_EXCEEDED'   : 'TLE',
         'MEMORY_LIMIT_EXCEEDED' : 'MLE',
-        'RUNTIME_ERROR' : 'RE',
-        'COMPILATION_ERROR' : 'CE',
+        'RUNTIME_ERROR'         : 'RE',
+        'COMPILATION_ERROR'     : 'CE',
+    }
+
+    lang_dict = {
+        'cpp'    : 0,
+        'python' : 0,
+        'java'   : 0,
+        'kotlin' : 0,
+        'js'     : 0,
+        'c#'     : 0,
+        'go'     : 0,
+        'others' : 0
     }
 
     ac_count = 0
@@ -130,7 +168,7 @@ def submissions(name, last):
     print('----------------------------------------------------')
 
     for curr in data:
-        # curr = data['result'][i]
+        
         problem = curr['problem']
 
         idx = problem['index']
@@ -138,11 +176,13 @@ def submissions(name, last):
         lang = curr['programmingLanguage']
         verdict = status[curr['verdict']]
 
+        lang_dict[normalize_lang(lang)] += 1
         if verdict == 'AC': ac_count += 1
 
         print(f"{idx:<5} {rating:<10} {verdict:<10} {lang:<20}")
 
-    st = {'ac' : ac_count, 'count' : count}
+    m_lang = max(lang_dict, key=lang_dict.get)
+    st = {'ac' : ac_count, 'count' : count, 'lang' : m_lang}
     summary(st)
 
 if __name__ == '__main__':

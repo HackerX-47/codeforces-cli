@@ -1,37 +1,6 @@
 from imports import *
 from api import caller
 
-basic_url = 'https://codeforces.com/api/'
-
-def caller(method, params):
-
-    url = basic_url + method
-
-    try:
-        r = req.get(url, params=params, timeout=5)
-
-        if r.status_code != 200:
-            print(f"Error: Codeforces returned HTTP {r.status_code}")
-            return None
-
-        data = r.json()
-
-        if data.get('status') != 'OK':
-            print(f"Error: {data.get('comment', 'Unknown error')}")
-            return None
-
-        return data['result']
-
-    except req.exceptions.Timeout:
-        print("Error: Request timed out.")
-
-    except req.exceptions.ConnectionError:
-        print("Error: Unable to connect to Codeforces.")
-
-    except req.exceptions.RequestException as e:
-        print(f"Error: {e}")
-    
-    return None
 
 def summary(st_dict):
 
@@ -46,6 +15,7 @@ def summary(st_dict):
     print('Accuracy     : ', f'{accuracy:.2f}%')
     print('Top Language : ', st_dict['lang'])
     return
+
 
 def normalize_lang(lang):
     lang = lang.lower()
@@ -73,9 +43,15 @@ def normalize_lang(lang):
 
     return "others"
 
+
+
+
 @click.group()
 def cli():
     pass
+
+
+
 
 @cli.command()
 @click.argument('name')
@@ -103,6 +79,9 @@ def user(name):
     print('max rating   : ', maxRating)
     print('rank         : ', rank) 
     print('organization : ', org)
+
+
+
 
 @cli.command()
 @click.argument('name')
@@ -132,16 +111,38 @@ def rating(name):
     print('Total Contests: ', len(data))
     print('Current Rating: ', data[-1]['newRating'])
 
+
+
+
 @cli.command()
-@click.option('--last', default=20, show_default=True, type=int)
+@click.option('--last', default=20, show_default=True, type=int, help = 'Show last n submissions')
+@click.option('--only-ac', is_flag=True, default=False, help='Show only accepted submissions')
+@click.option('--lang', default=None,
+            type=click.Choice(['cpp', 'python', 'java', 'kotlin', 'js', 'c#', 'go', 'others'], 
+                    case_sensitive=False), help='Filter by language')
+@click.option('--problem', default=None, help='Filter by problem index, e.g. A, B, C1')
 @click.argument('name')
-def submissions(name, last):
+def submissions(name, last, only_ac, lang, problem):
 
     count = last
     params = {'handle' : name, 'from' : 1, 'count' : count}
     data = caller('user.status', params)
     if data is None:
         return 
+
+    if only_ac: 
+        data = [d for d in data if d['verdict'] == 'OK']
+
+    if lang:    
+        data = [d for d in data if normalize_lang(d['programmingLanguage']) == lang.lower()]
+
+    if problem: 
+        data = [d for d in data if d['problem']['index'].upper() == problem.upper()]
+
+    if not data:
+        print()
+        print("No submissions match the given filters.")
+        return
 
     status = {
         'OK'                    : 'AC',
@@ -153,14 +154,8 @@ def submissions(name, last):
     }
 
     lang_dict = {
-        'cpp'    : 0,
-        'python' : 0,
-        'java'   : 0,
-        'kotlin' : 0,
-        'js'     : 0,
-        'c#'     : 0,
-        'go'     : 0,
-        'others' : 0
+        'cpp'    : 0, 'python' : 0, 'java'   : 0, 'kotlin' : 0, 
+        'js'     : 0, 'c#'     : 0, 'go'     : 0, 'others' : 0
     }
 
     ac_count = 0
@@ -185,6 +180,8 @@ def submissions(name, last):
     m_lang = max(lang_dict, key=lang_dict.get)
     st = {'ac' : ac_count, 'count' : count, 'lang' : m_lang}
     summary(st)
+    
+
 
 if __name__ == '__main__':
     cli()

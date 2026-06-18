@@ -16,4 +16,4 @@ dependencies = [
 cfcli = "cfcli.main:cli"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]

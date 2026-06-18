@@ -48,7 +48,7 @@ Top Language :  cpp
 Requires Python 3.8+.
 
 ```bash
-git clone https://github.com/<your-username>/codeforces-cli.git
+git clone https://github.com/HackerX-47/codeforces-cli.git
 cd codeforces-cli
 pip install -e .
 ```

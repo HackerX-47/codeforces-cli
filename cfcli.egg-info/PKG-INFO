@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: cfcli
-Version: 0.1.0
-Summary: Codeforces personal analytics CLI
-Requires-Python: >=3.8
-License-File: LICENSE
-Requires-Dist: click
-Requires-Dist: requests
-Dynamic: license-file

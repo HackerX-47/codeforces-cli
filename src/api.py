@@ -1,5 +1,7 @@
 from imports import *
 
+basic_url = 'https://codeforces.com/api/'
+
 def caller(method, params):
 
     url = basic_url + method

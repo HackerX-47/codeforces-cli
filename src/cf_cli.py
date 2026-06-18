@@ -2,6 +2,36 @@ import requests as req, click, json, re
 
 basic_url = 'https://codeforces.com/api/'
 
+def caller(method, params):
+
+    url = basic_url + method
+
+    try:
+        r = req.get(url, params=params, timeout=5)
+
+        if r.status_code != 200:
+            print(f"Error: Codeforces returned HTTP {r.status_code}")
+            return None
+
+        data = r.json()
+
+        if data.get('status') != 'OK':
+            print(f"Error: {data.get('comment', 'Unknown error')}")
+            return None
+
+        return data['result']
+
+    except req.exceptions.Timeout:
+        print("Error: Request timed out.")
+
+    except req.exceptions.ConnectionError:
+        print("Error: Unable to connect to Codeforces.")
+
+    except req.exceptions.RequestException as e:
+        print(f"Error: {e}")
+    
+    return None
+
 @click.group()
 def cli():
     pass
@@ -10,35 +40,42 @@ def cli():
 @click.argument('name')
 def user(name):
 
-    url = basic_url + 'user.info'
     params = {'handles' : name}
-    r = req.get(url, params = params)
-    data = r.json()
+    data = caller('user.info', params)
+    if data is None:
+        return 
 
-    user = data['result'][0]
+    user = data[0]
+
+    handle    = user.get('handle')
+    fullName  = f'{user.get('firstName') or ''} {user.get('lastName') or ''}'.strip() or 'N/A'
+    rating    = user.get('rating') or 'unrated'
+    rank      = user.get('rank') or 'unrated'
+    maxRating = user.get('maxRating') or 'unrated'
+    org       = user.get('organization') or 'N/A'
 
     print('user details')
     print('----------------------------')
-    print('handle       : ', user.get('handle'))
-    print('full name    : ', f'{user.get('firstName')} {user.get('lastName')}')
-    print('rating       : ', user.get('rating'))
-    print('max rating   : ', user.get('maxRating'))
-    print('rank         : ', user.get('rank'))
-    print('organization : ', user.get('organization'))
+    print('handle       : ', handle)
+    print('full name    : ', fullName)
+    print('rating       : ', rating)
+    print('max rating   : ', maxRating)
+    print('rank         : ', rank) 
+    print('organization : ', org)
 
 @cli.command()
 @click.argument('name')
 def rating(name):
 
-    url = basic_url + 'user.rating'
     params = {'handle' : name}
-    r = req.get(url, params = params)
-    data = r.json()
+    data = caller('user.rating', params)
+    if data is None:
+        return 
 
     print(f"{'contest type':<25} {'rank':>10} {'Δrating':>10} {'new Rating':>10}")
     print('----------------------------------------------------------')
 
-    for curr in data['result']:
+    for curr in data:
 
         contestName = curr['contestName']
         matches = re.findall(r'Div\. ?\d', contestName)
@@ -50,17 +87,17 @@ def rating(name):
         print(f"{contestType:<25} {rank:>10} {ratingChange:>+10} {curr['newRating']:>10}")
 
     print()
-    print('Total Contests: ', len(data['result']))
-    print('Current Rating: ', data['result'][-1]['newRating'])
+    print('Total Contests: ', len(data))
+    print('Current Rating: ', data[-1]['newRating'])
 
 @cli.command()
 @click.argument('name')
 def submissions(name):
 
-    url = basic_url + 'user.status'
     params = {'handle' : name, 'from' : 1, 'count' : 20}
-    r = req.get(url, params = params)
-    data = r.json()
+    data = caller('user.status', params)
+    if data is None:
+        return 
 
     status = {
         'OK' : 'AC',
@@ -72,9 +109,9 @@ def submissions(name):
     }
 
     print(f"{'prob':<5} {'rating':<10} {'verdict':<10} {'lang':<20}")
-    print('--------------------------------------------------------------')
+    print('----------------------------------------------------')
 
-    for curr in data['result']:
+    for curr in data:
         # curr = data['result'][i]
         problem = curr['problem']
 

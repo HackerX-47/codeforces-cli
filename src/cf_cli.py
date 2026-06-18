@@ -1,4 +1,5 @@
-import requests as req, click, json, re
+from imports import *
+from api import caller
 
 basic_url = 'https://codeforces.com/api/'
 

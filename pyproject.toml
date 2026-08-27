@@ -3,17 +3,19 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cfcli"
-version = "0.1.0"
+name = "cfv2"
+version = "0.2.0"
 description = "Codeforces personal analytics CLI"
 requires-python = ">=3.8"
 dependencies = [
     "click",
     "requests",
+    "google-genai",
+    "python-dotenv",
 ]
 
 [project.scripts]
-cfcli = "cfcli.main:cli"
+cfv2 = "cfcli.main:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]

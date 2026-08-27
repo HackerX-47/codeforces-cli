@@ -1,9 +1,16 @@
 from cfcli.imports import *
 from cfcli.api import caller
+from cfcli.gemini import ask_gemini
 
 @click.command()
 @click.argument("name")
 def user(name):
+
+    question = "What is today's date?"
+    answer = ask_gemini(question)
+    
+    print("\nGemini: ")
+    print(answer)
 
     params = {"handles" : name}
     data = caller("user.info", params)
@@ -21,11 +28,14 @@ def user(name):
     maxRating = user.get("maxRating") or "Unrated"
     org       = user.get("organization") or "N/A"
 
-    print("\nuser details")
+    print("🔥🔥🔥 NEW USER.PY IS RUNNING 🔥🔥🔥")
+    print("\nxuser details")
     print("----------------------------")
     print("handle       : ", handle)
     print("full name    : ", fullName)
-    print("rating       : ", rating)
     print("max rating   : ", maxRating)
     print("rank         : ", rank) 
     print("organization : ", org)
+
+
+    

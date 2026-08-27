@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cfv2 = "cfcli.main:cli"
+cfv2 = "cfv2.main:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]

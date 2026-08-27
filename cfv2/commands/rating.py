@@ -1,5 +1,5 @@
-from cfcli.functions import *
-from cfcli.api import caller
+from cfv2.functions import *
+from cfv2.api import caller
 
 @click.command()
 @click.argument("name")

@@ -1,16 +1,10 @@
-from cfcli.imports import *
-from cfcli.api import caller
-from cfcli.gemini import ask_gemini
+from cfv2.imports import *
+from cfv2.api import caller
+from cfv2.gemini import ask_gemini
 
 @click.command()
 @click.argument("name")
 def user(name):
-
-    question = "What is today's date?"
-    answer = ask_gemini(question)
-    
-    print("\nGemini: ")
-    print(answer)
 
     params = {"handles" : name}
     data = caller("user.info", params)
@@ -38,4 +32,8 @@ def user(name):
     print("organization : ", org)
 
 
-    
+    question = "What is today's date?"
+    answer = ask_gemini(question)
+        
+    print("\nGemini: ")
+    print(answer)

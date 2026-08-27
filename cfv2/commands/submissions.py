@@ -1,5 +1,5 @@
-from cfcli.functions import *
-from cfcli.api import caller
+from cfv2.functions import *
+from cfv2.api import caller
 
 @click.command()
 @click.option("--last", default=20, show_default=True, type=int, help = "Show last n submissions")

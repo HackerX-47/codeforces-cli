@@ -1,4 +1,4 @@
-from cfcli.imports import *
+from cfv2.imports import *
 
 basic_url = 'https://codeforces.com/api/'
 

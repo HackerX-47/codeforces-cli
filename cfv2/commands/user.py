@@ -22,8 +22,7 @@ def user(name):
     maxRating = user.get("maxRating") or "Unrated"
     org       = user.get("organization") or "N/A"
 
-    print("🔥🔥🔥 NEW USER.PY IS RUNNING 🔥🔥🔥")
-    print("\nxuser details")
+    print("\nuser details")
     print("----------------------------")
     print("handle       : ", handle)
     print("full name    : ", fullName)
@@ -32,7 +31,7 @@ def user(name):
     print("organization : ", org)
 
 
-    question = "What is today's date?"
+    question = "25*3? in number only"
     answer = ask_gemini(question)
         
     print("\nGemini: ")

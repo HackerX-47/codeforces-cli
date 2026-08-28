@@ -11,6 +11,10 @@ def fetch_rating_data(name, opt = 0):
 
     df = pd.DataFrame(data)
 
+    df["ratingChange"] = df["newRating"] - df["oldRating"]
+    df["datetime"] = pd.to_datetime(df["ratingUpdateTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
+    df["month"] = df["datetime"].dt.to_period("M")
+
     totalContests   = len(df)
     best_rank       = 0
     worst_rank      = float('inf')
@@ -21,11 +25,16 @@ def fetch_rating_data(name, opt = 0):
     no_chng_count   = 0
     best_rating     = 0
     worst_rating    = float('inf')
-    ovl_rating_chng = data[-1]["newRating"] - data[0]["oldRating"]
+    ovl_rating_chng = df["ratingChange"].sum()
+    
+    
+    m_grp = df.groupby("month").agg(
+        rating_start=("oldRating", "first"),
+        rating_end=("newRating", "last"),
+        rating_change=("ratingChange", "sum")
+    )
 
-
-
-    header();
+    if opt == 1:    header();
 
     for index, curr in df.iterrows():
 
@@ -78,5 +87,6 @@ def fetch_rating_data(name, opt = 0):
     if opt == 1:
         print()
         print2(data2)
+        pprint(m_grp)
 
     return data2

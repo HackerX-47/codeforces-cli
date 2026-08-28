@@ -47,6 +47,12 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     df["problem_id"]    = df["problem"].apply(lambda x: (x.get("contestId"), x.get("index")))
     df["attempts"]      = df.groupby("problem_id")["problem_id"].transform("size")
     df["problem_rating"]= df["problem"].apply(lambda x: x.get("rating"))
+    df["datetime"] = pd.to_datetime(df["creationTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
+    df["month"] = df["datetime"].dt.to_period("M")
+    df["hour"] = df["datetime"].dt.hour
+    df["shift"] = pd.cut(df["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
+
+
     accepted            = df[df["verdict"] == "OK"]
     unique_accepted     = accepted.drop_duplicates(subset=["problem_id"]).copy()
     unique_attempted    = df.drop_duplicates(subset=["problem_id"])
@@ -78,16 +84,8 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     )
 
     avg_attempts_to_solve = round(unique_accepted["attempts"].mean(), 2)
-
-
-    df["datetime"] = pd.to_datetime(df["creationTimeSeconds"], unit="s")
-    df["hour"] = df["datetime"].dt.hour
-    df["shift"] = pd.cut(df["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
+    
     shift_count = (df.groupby("shift", observed=True)["verdict"].count().to_dict())
-
-    unique_accepted["datetime"] = pd.to_datetime(unique_accepted["creationTimeSeconds"], unit="s")
-    unique_accepted["hour"] = unique_accepted["datetime"].dt.hour
-    unique_accepted["shift"] = pd.cut(unique_accepted["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
     ac_shift_count = (unique_accepted.groupby("shift", observed=True)["verdict"].count().to_dict())
 
     ac_rate_shift = {
@@ -95,6 +93,23 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         if count else 0
         for shift, count in shift_count.items()
     }
+
+    monthly_submissions_grp     = df.groupby("month")
+    monthly_unique_ac_grp       = unique_accepted.groupby("month")
+    monthly_unique_attempt_grp  = unique_attempted.groupby("month")
+
+    total_submissions_monthly   = monthly_submissions_grp   ["verdict"].count().to_dict()
+    unique_accepted_monthly     = monthly_unique_ac_grp     ["verdict"].count().to_dict()
+    unique_attempted_monthly    = monthly_unique_attempt_grp["verdict"].count().to_dict()
+
+    ac_rate_monthly = {
+        month: round((unique_accepted_monthly.get(month, 0) / count) * 100, 2)
+        if count else 0
+        for month, count in total_submissions_monthly.items()
+    }
+
+    monthly_avg_attempts_to_solve   = round(monthly_unique_ac_grp["attempts"].mean(), 2).to_dict()
+    monthly_avg_rating_solved       = monthly_unique_ac_grp["problem_rating"].mean().astype(int).to_dict()
 
     if opt == 1:    header()
 
@@ -122,25 +137,31 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     m_lang = max(lang_dict, key=lang_dict.get) if any(lang_dict.values()) else "N/A"
 
     data2 = {
-        "verdict_count"  : verdict_count, 
-        "count"          : len(df), 
-        "lang"           : m_lang,
-        "unique_attempt" : unique_attempted_cnt,
-        "unique_ac"      : unique_accepted_cnt,
-        "attempt_rating" : attempted_by_rating,
-        "solved_rating"  : solved_by_rating,
-        "avg_sol_rating" : int(avg_solved_rating),
-        "hi_sol_rating"  : highest_sol_rating,
-        "lo_sol_rating"  : lowest_solved_rating,
-        "ac_rate_rating" : ac_rate_by_rating,
-        "avg_attempts"   : avg_attempts_to_solve,
-        "tag_count"      : tag_count,
-        "shift_count"    : shift_count,
-        "ac_shift_count" : ac_shift_count,
-        "ac_rate_shift"  : ac_rate_shift
+        "verdict_count"     : verdict_count, 
+        "count"             : len(df), 
+        "lang"              : m_lang,
+        "unique_attempt"    : unique_attempted_cnt,
+        "unique_ac"         : unique_accepted_cnt,
+        "attempt_rating"    : attempted_by_rating,
+        "solved_rating"     : solved_by_rating,
+        "avg_sol_rating"    : int(avg_solved_rating),
+        "hi_sol_rating"     : highest_sol_rating,
+        "lo_sol_rating"     : lowest_solved_rating,
+        "ac_rate_rating"    : ac_rate_by_rating,
+        "avg_attempts"      : avg_attempts_to_solve,
+        "tag_count"         : tag_count,
+        "shift_count"       : shift_count,
+        "ac_shift_count"    : ac_shift_count,
+        "ac_rate_shift"     : ac_rate_shift,
+        "m_submissions"     : total_submissions_monthly,
+        "m_ac_submissions"  : unique_accepted_monthly,
+        "m_att_submissions" : unique_attempted_monthly,
+        "m_ac_rate"         : ac_rate_monthly,
+        "m_avg_attempts"    : monthly_avg_attempts_to_solve,
+        "m_avg_rating_sol"  : monthly_avg_rating_solved,
     }
 
     if(opt == 1):
         print2(data2)
-        
+
     return data2

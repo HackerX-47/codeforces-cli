@@ -9,10 +9,12 @@ def fetch_rating_data(name, opt = 0):
     if data is None:
         return 
 
-    totalContests = len(data)
-    best_rank   = 0
-    worst_rank  = float('inf')
-    avg_rank    = 0
+    df = pd.DataFrame(data)
+
+    totalContests   = len(df)
+    best_rank       = 0
+    worst_rank      = float('inf')
+    avg_rank        = 0
     avg_rating_chng = 0
     pos_chng_count  = 0
     neg_chng_count  = 0
@@ -25,13 +27,13 @@ def fetch_rating_data(name, opt = 0):
 
     header();
 
-    for curr in data:
+    for index, curr in df.iterrows():
 
-        contestName  = curr["contestName"]
+        contestName  = df.loc[index, "contestName"]
         matches      = re.findall(r"Div\. ?\d", contestName)
-        currRating   = curr["newRating"]
-        ratingChange = curr["newRating"]-curr["oldRating"]
-        rank         = curr["rank"]
+        currRating   = df.loc[index, "newRating"]
+        ratingChange = df.loc[index, "newRating"]-df.loc[index, "oldRating"]
+        rank         = df.loc[index, "rank"]
 
         best_rank        = max(rank, best_rank)
         worst_rank       = min(rank, worst_rank)
@@ -60,7 +62,7 @@ def fetch_rating_data(name, opt = 0):
 
     data2 = {
         "totalContest"  : totalContests, 
-        "currRating"    : data[-1]["newRating"],
+        "currRating"    : df.iloc[-1]["newRating"],
         "bestRank"      : best_rank,
         "worstRank"     : worst_rank,
         "avgRank"       : avg_rank,

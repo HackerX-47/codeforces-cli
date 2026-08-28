@@ -1,6 +1,7 @@
 from cfv2.functions import *
 from cfv2.api import caller
 from cfv2.display.submissions_display import *
+from pprint import pprint
 
 def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
 
@@ -61,6 +62,14 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     highest_sol_rating  = int(unique_accepted["problem_rating"].max())
     lowest_solved_rating= int(unique_accepted["problem_rating"].min())
 
+    unique_accepted["tags"] = unique_accepted["problem"].apply(lambda x: x.get("tags", []))
+    tag_count = (
+        unique_accepted["tags"]
+        .explode()
+        .value_counts()
+        .to_dict()
+    )
+
     ac_rate_by_rating = (
         df.dropna(subset=["problem_rating"])
         .groupby("problem_rating")["verdict"]
@@ -108,7 +117,8 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         "hi_sol_rating"  : highest_sol_rating,
         "lo_sol_rating"  : lowest_solved_rating,
         "ac_rate_rating" : ac_rate_by_rating,
-        "avg_attempts"   : avg_attempts_to_solve
+        "avg_attempts"   : avg_attempts_to_solve,
+        "tag_count"      : tag_count
     }
 
     if(opt == 1):

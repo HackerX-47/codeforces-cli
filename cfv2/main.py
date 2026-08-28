@@ -2,6 +2,7 @@ from cfv2.imports import *
 from cfv2.commands.user import user
 from cfv2.commands.rating import rating
 from cfv2.commands.submissions import submissions
+from cfv2.commands.summary import summary
 
 @click.group()
 def cli():
@@ -10,6 +11,7 @@ def cli():
 cli.add_command(user)
 cli.add_command(rating)
 cli.add_command(submissions)
+cli.add_command(summary)
 
 if __name__ == "__main__":
     cli()

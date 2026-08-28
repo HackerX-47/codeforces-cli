@@ -1,7 +1,6 @@
 from cfv2.functions import *
 from cfv2.api import caller
 from cfv2.display.submissions_display import *
-from pprint import pprint
 
 def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
 
@@ -49,7 +48,7 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     df["attempts"]      = df.groupby("problem_id")["problem_id"].transform("size")
     df["problem_rating"]= df["problem"].apply(lambda x: x.get("rating"))
     accepted            = df[df["verdict"] == "OK"]
-    unique_accepted     = accepted.drop_duplicates(subset=["problem_id"])
+    unique_accepted     = accepted.drop_duplicates(subset=["problem_id"]).copy()
     unique_attempted    = df.drop_duplicates(subset=["problem_id"])
 
     unique_accepted_cnt = len(unique_accepted)
@@ -79,6 +78,23 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     )
 
     avg_attempts_to_solve = round(unique_accepted["attempts"].mean(), 2)
+
+
+    df["datetime"] = pd.to_datetime(df["creationTimeSeconds"], unit="s")
+    df["hour"] = df["datetime"].dt.hour
+    df["shift"] = pd.cut(df["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
+    shift_count = (df.groupby("shift", observed=True)["verdict"].count().to_dict())
+
+    unique_accepted["datetime"] = pd.to_datetime(unique_accepted["creationTimeSeconds"], unit="s")
+    unique_accepted["hour"] = unique_accepted["datetime"].dt.hour
+    unique_accepted["shift"] = pd.cut(unique_accepted["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
+    ac_shift_count = (unique_accepted.groupby("shift", observed=True)["verdict"].count().to_dict())
+
+    ac_rate_shift = {
+        shift: round((ac_shift_count.get(shift, 0) / count) * 100, 2)
+        if count else 0
+        for shift, count in shift_count.items()
+    }
 
     if opt == 1:    header()
 
@@ -118,9 +134,13 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         "lo_sol_rating"  : lowest_solved_rating,
         "ac_rate_rating" : ac_rate_by_rating,
         "avg_attempts"   : avg_attempts_to_solve,
-        "tag_count"      : tag_count
+        "tag_count"      : tag_count,
+        "shift_count"    : shift_count,
+        "ac_shift_count" : ac_shift_count,
+        "ac_rate_shift"  : ac_rate_shift
     }
 
     if(opt == 1):
         print2(data2)
+        
     return data2

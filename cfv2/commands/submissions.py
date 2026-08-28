@@ -1,7 +1,7 @@
 from cfv2.core.fetch_submissions import *
 
 @click.command()
-@click.option("--last", default=20, show_default=True, type=int, help = "Show last n submissions")
+@click.option("--last", default=50, show_default=True, type=int, help = "Show last n submissions")
 @click.option("--only-ac", is_flag=True, default=False, help="Show only accepted submissions")
 @click.option("--lang", default=None,
             type=click.Choice(["cpp", "python", "java", "kotlin", "js", "c#", "go", "others"], 

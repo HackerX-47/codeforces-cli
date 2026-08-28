@@ -9,7 +9,7 @@ def print1(data):
 
 def print2(st_dict):
 
-    ac_count = st_dict["ac"]
+    ac_count = st_dict["verdict_count"]["AC"]
     count = st_dict["count"]
     accuracy = (ac_count/count)*100 if count else 0
     print()

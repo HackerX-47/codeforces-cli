@@ -11,9 +11,9 @@ def fetch_rating_data(name, opt = 0):
 
     df = pd.DataFrame(data)
 
-    df["ratingChange"] = df["newRating"] - df["oldRating"]
-    df["datetime"] = pd.to_datetime(df["ratingUpdateTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
-    df["month"] = df["datetime"].dt.to_period("M")
+    df["ratingChange"]  = df["newRating"] - df["oldRating"]
+    df["datetime"]      = pd.to_datetime(df["ratingUpdateTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
+    df["month"]         = df["datetime"].dt.to_period("M")
 
     totalContests   = len(df)
     best_rank       = 0
@@ -70,23 +70,23 @@ def fetch_rating_data(name, opt = 0):
     no_chng_count = totalContests - (pos_chng_count + neg_chng_count)
 
     data2 = {
-        "totalContest"  : totalContests, 
-        "currRating"    : df.iloc[-1]["newRating"],
-        "bestRank"      : best_rank,
-        "worstRank"     : worst_rank,
-        "avgRank"       : avg_rank,
-        "avgRatingChng" : avg_rating_chng,
-        "posChngCount"  : pos_chng_count,
-        "negChngCount"  : neg_chng_count,
-        "noChngCount"   : no_chng_count,
-        "bestRating"    : best_rating,
-        "worstRating"   : worst_rating,
-        "ovlRatingChng" : ovl_rating_chng
+        "totalContest"      : totalContests, 
+        "currRating"        : df.iloc[-1]["newRating"],
+        "bestRank"          : best_rank,
+        "worstRank"         : worst_rank,
+        "avgRank"           : avg_rank,
+        "avgRatingChng"     : avg_rating_chng,
+        "posChngCount"      : pos_chng_count,
+        "negChngCount"      : neg_chng_count,
+        "noChngCount"       : no_chng_count,
+        "bestRating"        : best_rating,
+        "worstRating"       : worst_rating,
+        "ovlRatingChng"     : ovl_rating_chng,
+        "m_rating_analysis" : m_grp
     }
 
     if opt == 1:
         print()
         print2(data2)
-        pprint(m_grp)
 
     return data2

@@ -4,10 +4,11 @@ from cfv2.display.submissions_display import *
 
 def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
 
-    count = last
+    count   = last
     if opt == 0: count = 100000
-    params = {"handle" : name, "from" : 1, "count" : count}
-    data = caller("user.status", params)
+    params  = {"handle" : name, "from" : 1, "count" : count}
+    data    = caller("user.status", params)
+
     if data is None:
         return 
 
@@ -47,10 +48,10 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     df["problem_id"]    = df["problem"].apply(lambda x: (x.get("contestId"), x.get("index")))
     df["attempts"]      = df.groupby("problem_id")["problem_id"].transform("size")
     df["problem_rating"]= df["problem"].apply(lambda x: x.get("rating"))
-    df["datetime"] = pd.to_datetime(df["creationTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
-    df["month"] = df["datetime"].dt.to_period("M")
-    df["hour"] = df["datetime"].dt.hour
-    df["shift"] = pd.cut(df["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
+    df["datetime"]      = pd.to_datetime(df["creationTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
+    df["month"]         = df["datetime"].dt.to_period("M")
+    df["hour"]          = df["datetime"].dt.hour
+    df["shift"]         = pd.cut(df["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
 
 
     accepted            = df[df["verdict"] == "OK"]
@@ -85,8 +86,8 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
 
     avg_attempts_to_solve = round(unique_accepted["attempts"].mean(), 2)
     
-    shift_count = (df.groupby("shift", observed=True)["verdict"].count().to_dict())
-    ac_shift_count = (unique_accepted.groupby("shift", observed=True)["verdict"].count().to_dict())
+    shift_count     = (df.groupby("shift", observed=True)["verdict"].count().to_dict())
+    ac_shift_count  = (unique_accepted.groupby("shift", observed=True)["verdict"].count().to_dict())
 
     ac_rate_shift = {
         shift: round((ac_shift_count.get(shift, 0) / count) * 100, 2)

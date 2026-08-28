@@ -23,15 +23,15 @@ def fetch_user_data(name, opt = 0):
     org       = user.get("organization") or "N/A"
 
     data = {
-        "handle" : handle,
-        "fullName" : fullName,
+        "handle"    : handle,
+        "fullName"  : fullName,
         "maxRating" : maxRating,
-        "rank" : rank,
-        "org" : org
+        "rank"      : rank,
+        "org"       : org
     }
 
-    question = "25*3? in number only"
-    answer = ask_gemini(question)
+    question= "25*3? in number only"
+    answer  = ask_gemini(question)
 
     if opt == 1:
         header()

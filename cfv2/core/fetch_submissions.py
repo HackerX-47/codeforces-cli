@@ -49,7 +49,7 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
     df["attempts"]      = df.groupby("problem_id")["problem_id"].transform("size")
     df["problem_rating"]= df["problem"].apply(lambda x: x.get("rating"))
     df["datetime"]      = pd.to_datetime(df["creationTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
-    df["month"]         = df["datetime"].dt.to_period("M")
+    df["month"]         = df["datetime"].dt.tz_localize(None).dt.to_period("M")
     df["hour"]          = df["datetime"].dt.hour
     df["shift"]         = pd.cut(df["hour"], bins=[-1, 5, 11, 17, 23], labels=["Night", "Morning", "Afternoon", "Evening"])
 

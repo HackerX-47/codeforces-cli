@@ -13,7 +13,7 @@ def fetch_rating_data(name, opt = 0):
 
     df["ratingChange"]  = df["newRating"] - df["oldRating"]
     df["datetime"]      = pd.to_datetime(df["ratingUpdateTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
-    df["month"]         = df["datetime"].dt.to_period("M")
+    df["month"]         = df["datetime"].dt.tz_localize(None).dt.to_period("M")
 
     totalContests   = len(df)
     best_rank       = 0

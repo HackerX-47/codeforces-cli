@@ -19,6 +19,7 @@ def summary(name):
         problem=None,
         opt=0
     )
+    terminal_width = shutil.get_terminal_size().columns
 
     prompt = f"""
     You are a Codeforces performance analyst.
@@ -297,7 +298,9 @@ def summary(name):
     Make the report clean and readable when printed directly
     in a Linux terminal.
 
-    One more thing: Format text to fit within the terminal width of 150 chars. Prefer wrapping at word boundaries and never split a word unless absolutely necessary.
+    The terminal width is {terminal_width} columns.
+    Keep EVERY output line at or below {terminal_width} columns.
+    Never split words; wrap only at whitespace.
 
     Format every recommendation using this exact terminal-friendly structure:
 
@@ -340,4 +343,7 @@ def summary(name):
 
     """
 
-    output_print(ask_gemini(prompt))
+    response = ask_gemini(prompt)
+
+    if response:
+        output_print(response)

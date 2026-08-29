@@ -37,6 +37,8 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         "COMPILATION_ERROR"     : "CE",
     }
 
+    submission_data = {}
+
     keys = ["AC", "WA", "TLE", "MLE", "CE", "RE", "OTHER"]
     verdict_count = {key: 0 for key in keys}
 
@@ -111,8 +113,7 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
 
     monthly_avg_attempts_to_solve   = round(monthly_unique_ac_grp["attempts"].mean(), 2).dropna().to_dict()
     monthly_avg_rating_solved = monthly_unique_ac_grp["problem_rating"].mean().round().astype("Int64").to_dict()
-    
-    if opt == 1:    header()
+
 
     for index, curr in df.iterrows():
 
@@ -125,15 +126,12 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         lang_dict[normalize_lang(lang)] += 1
         verdict_count[verdict]          += 1 
 
-        data1 = {
-            "index" : idx, 
-            "rating" : rating,
-            "verdict" : verdict,
-            "lang"  : lang
+        submission_data[index] = {
+            "index"     : idx, 
+            "rating"    : rating,
+            "verdict"   : verdict,
+            "lang"      : lang
         }
-
-        if opt == 1:
-            print1(data1)
 
     m_lang = max(lang_dict, key=lang_dict.get) if any(lang_dict.values()) else "N/A"
 
@@ -162,7 +160,14 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         "m_avg_rating_sol"  : monthly_avg_rating_solved,
     }
 
+    submission_df = pd.DataFrame.from_dict(
+        submission_data,
+        orient="index"
+    )
+
     if(opt == 1):
         print2(data2)
+        header()
+        print1(submission_df)
 
     return data2

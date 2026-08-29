@@ -15,6 +15,7 @@ def fetch_rating_data(name, opt = 0):
     df["datetime"]      = pd.to_datetime(df["ratingUpdateTimeSeconds"], unit="s", utc = True).dt.tz_convert("Asia/Kolkata")
     df["month"]         = df["datetime"].dt.tz_localize(None).dt.to_period("M")
 
+    contest_data = {}
     totalContests   = len(df)
     best_rank       = 0
     worst_rank      = float('inf')
@@ -33,8 +34,6 @@ def fetch_rating_data(name, opt = 0):
         rating_end=("newRating", "last"),
         rating_change=("ratingChange", "sum")
     )
-
-    if opt == 1:    header();
 
     for index, curr in df.iterrows():
 
@@ -58,14 +57,13 @@ def fetch_rating_data(name, opt = 0):
         if matches: contestType = " + ".join(matches)
         else:       contestType = contestName
 
-        data1 = {
-            "contestType" : contestType,
-            "rank" : rank, 
-            "ratingChange" : ratingChange,
-            "currRating" : currRating
+        contest_data[index] = {
+            "contestType"   : contestType,
+            "rank"          : rank,
+            "ratingChange"  : ratingChange,
+            "currRating"    : currRating
         }
 
-        if opt == 1: print1(data1)
 
     no_chng_count = totalContests - (pos_chng_count + neg_chng_count)
 
@@ -85,8 +83,16 @@ def fetch_rating_data(name, opt = 0):
         "m_rating_analysis" : m_grp
     }
 
+    contest_df = pd.DataFrame.from_dict(
+        contest_data,
+        orient="index"
+    )
+
     if opt == 1:
         print()
         print2(data2)
+        header()
+        print1(contest_df)
+
 
     return data2

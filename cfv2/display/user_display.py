@@ -2,8 +2,8 @@ from cfv2.imports import *
 
 def header():
 
-    print("\nuser details")
-    print("----------------------------")
+    print("\nUSER DETAILS")
+    print("─"*12)
     return
 
 def display(user_data):

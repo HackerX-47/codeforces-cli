@@ -1,8 +1,6 @@
 from cfv2.imports import *
 from cfv2.api import caller
-from cfv2.gemini import ask_gemini
 from cfv2.display.user_display import *
-from cfv2.display.gemini_display import *
 
 def fetch_user_data(name, opt = 0):
 
@@ -30,13 +28,8 @@ def fetch_user_data(name, opt = 0):
         "org"       : org
     }
 
-    question= "25*3? in number only"
-    answer  = ask_gemini(question)
-
     if opt == 1:
         header()
         display(data)  
-        print("\nGemini: ")
-        output_print(answer) 
        
     return data

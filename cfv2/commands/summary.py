@@ -166,7 +166,7 @@ def summary(name):
     Use concrete numbers from the data where useful.
     Do not simply repeat the raw statistics; interpret them.
 
-    
+
 
     ================ OUTPUT FORMAT ================
 
@@ -186,9 +186,9 @@ def summary(name):
 
     Use this hierarchy:
 
-    # MAIN TITLE
+    MAIN TITLE
 
-    ## [1] SECTION NAME
+    [1] SECTION NAME
 
     Subsection Name
     • Point
@@ -296,6 +296,47 @@ def summary(name):
 
     Make the report clean and readable when printed directly
     in a Linux terminal.
+
+    One more thing: Format text to fit within the terminal width of 150 chars. Prefer wrapping at word boundaries and never split a word unless absolutely necessary.
+
+    Format every recommendation using this exact terminal-friendly structure:
+
+    [04] STABILIZE CONTEST PERFORMANCE
+    ──────────────────────────────────
+
+    INSIGHT
+    Rating fell 4009 → 3528 (-481).
+
+    RECENT DAMAGE
+    Apr 2026  -282
+    Aug 2025  -201
+
+    ACTION
+    Prioritize consistent contest execution.
+    Goal: stabilize rating and recover toward 4000.
+
+    RULES:
+
+    * Keep the output clean, compact, and terminal-friendly.
+    * Use uppercase section labels: INSIGHT, EVIDENCE, RECENT DAMAGE, ACTION, WHY, etc.
+    * Put the recommendation title on the first line.
+    * Use a horizontal separator below the title.
+    * Keep each line within the available terminal width.
+    * NEVER break or split words.
+    * Wrap long sentences at word boundaries.
+    * Prefer short, information-dense sentences.
+    * Use 1–2 lines maximum for INSIGHT and ACTION explanations.
+    * Use bullets only when listing multiple pieces of evidence.
+    * Put important numbers, rating changes, dates, and metrics on separate lines when useful.
+    * Do not use Markdown headings such as #, ##, or ###.
+    * Do not use tables.
+    * Do not use long paragraphs.
+    * Do not add unnecessary introductory or concluding text.
+    * Maintain consistent spacing between sections.
+    * Recommendation numbers must use two digits: [01], [02], [03], etc.
+    * The final output should look natural in a Unix/Linux terminal.
+
+    If the terminal width is unknown, assume a safe content width of 150 characters.
 
     """
 

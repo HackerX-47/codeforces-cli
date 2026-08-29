@@ -37,7 +37,7 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         "COMPILATION_ERROR"     : "CE",
     }
 
-    keys = ["AC", "WA", "TLE", "MLE", "CE", "RE"]
+    keys = ["AC", "WA", "TLE", "MLE", "CE", "RE", "OTHER"]
     verdict_count = {key: 0 for key in keys}
 
     lang_dict = {
@@ -109,9 +109,9 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         for month, count in total_submissions_monthly.items()
     }
 
-    monthly_avg_attempts_to_solve   = round(monthly_unique_ac_grp["attempts"].mean(), 2).to_dict()
-    monthly_avg_rating_solved       = monthly_unique_ac_grp["problem_rating"].mean().astype(int).to_dict()
-
+    monthly_avg_attempts_to_solve   = round(monthly_unique_ac_grp["attempts"].mean(), 2).dropna().to_dict()
+    monthly_avg_rating_solved = monthly_unique_ac_grp["problem_rating"].mean().round().astype("Int64").to_dict()
+    
     if opt == 1:    header()
 
     for index, curr in df.iterrows():
@@ -120,7 +120,7 @@ def fetch_submissions_data(name, last, only_ac, lang, problem, opt = 0):
         lang    = df.loc[index, "programmingLanguage"]
         idx     = problem["index"]
         rating  = problem.get("rating", "-")
-        verdict = status[df.loc[index, "verdict"]]
+        verdict = status.get(df.loc[index, "verdict"], "OTHER")
 
         lang_dict[normalize_lang(lang)] += 1
         verdict_count[verdict]          += 1 

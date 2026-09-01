@@ -35,3 +35,6 @@ htmlcov/
 
 # Type checking
 .mypy_cache/
+
+# images folder
+images/

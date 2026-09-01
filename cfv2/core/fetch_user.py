@@ -20,7 +20,7 @@ def fetch_user_data(name, opt = 0):
     maxRating = user.get("maxRating") or "Unrated"
     org       = user.get("organization") or "N/A"
 
-    data = {
+    user_data = {
         "handle"    : handle,
         "fullName"  : fullName,
         "maxRating" : maxRating,
@@ -30,6 +30,6 @@ def fetch_user_data(name, opt = 0):
 
     if opt == 1:
         header()
-        display(data)  
+        display(user_data)  
        
     return data
